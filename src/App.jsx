@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { PDFDocument } from 'pdf-lib'; // Import PDFDocument from pdf-lib
+// Import PDFDocument from pdf-lib
+import { PDFDocument } from 'pdf-lib'; 
+// Import zoomPlugin for zoom features
+import { zoomPlugin } from '@react-pdf-viewer/zoom';
+// Import ReactPDFViewer to view pdf and to drag and drop
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import './App.css';
@@ -16,13 +20,14 @@ function App() {
   
   //Drop function
   const DropFile = (event) => {
-    event.preventDefault(); //this prevents browser from opening the file 
-    const file = event.dataTransfer.files[0]; // Get the dropped file
+    //this prevents browser from opening the file 
+    event.preventDefault(); 
+    // Get the dropped file
+    const file = event.dataTransfer.files[0]; 
 
     if (file && file.type == 'application/pdf') {
       // Set the PDF file to state
       setPdfFile(file);
-
       const fileReader = new FileReader();
       fileReader.onload = (event) => {
         setPdfUrl(fileReader.result);
@@ -33,25 +38,49 @@ function App() {
     }
   };
 
-  //uploadFile function
-  const uploadFile = async () => {
-    if (pdfFile) {
-      const pdfData = await pdfFile.arrayBuffer(); // Read the PDF file as an ArrayBuffer
-      const pdfDoc = await PDFDocument.load(pdfData); // Load the PDF document
-      console.log('PDF Document loaded:', pdfDoc);
-    } else {
-      alert('No PDF file selected.');
+  //uploadFile function  
+  const uploadFile = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type == 'application/pdf') {
+      setPdfFile(file);
+      const fileReader = new FileReader();
+      fileReader.onload = (event) => {
+        setPdfUrl(fileReader.result);
+      };
+      fileReader.readAsDataURL(file);
     }
-  };
+    else {
+      alert('File selected is not a valid PDF file');
+    }
+  }
+
+  //Zoom functions
+  const zoomPluginInstance = zoomPlugin();
+  const { ZoomInButton, ZoomOutButton } = zoomPluginInstance
+
 
   return (
     <>
+      {/* Utility Bar */}
+      {
+        <div className = "utilities" style={{ border: '2px solid #ccc', padding: '20px', textAlign: 'center',margin: '20px 0',}}>
+        <button onClick={() => setPdfFile(null)}>Save</button>
+        <button onClick={() => setPdfUrl(null)}>Add Text</button>
+        <button onClick={() => setPdfFile(null)}>Remove Text</button>
+        <button onClick={() => setPdfFile(null)}>TEXT STYLES</button>
+        <ZoomInButton />
+        <ZoomOutButton />
+        </div>
+      }
+
+
       {/* PDF Preview */}
       {pdfUrl && (
-        <div style={{ marginBottom: '20px', border: '1px solid #ccc' }}>
-
+        <div className = "PDFViewer"
+        style={{ marginBottom: '20px', border: '10px solid #ccc', width: '100%', height: '90vh',overflow: 'auto'}}>
+        {/* Worker URL to be compatible to the npm version  */} 
       <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
-        <Viewer fileUrl={pdfUrl} />
+        <Viewer fileUrl={pdfUrl} plugins = {[zoomPluginInstance]}/>
       </Worker>
 
         </div>
@@ -72,9 +101,10 @@ function App() {
         <p>Drag and drop a PDF file here</p>
       </div>
 
-      <button onClick={uploadFile} disabled={!pdfFile}>
-        Upload PDF
-      </button>
+      {/* File input for manual upload */}
+      <div style={{ margin: '20px 0' }}>
+        <input type="file" accept="application/pdf" onChange={uploadFile} />
+      </div>
     </>
   );
 }
