@@ -12,6 +12,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+#root {
+  background-color: #242424; /* Match background color */
+  margin: 0 auto;
+  padding: 10%;
+  border: 0;
+  width: 100%; /* Allow it to take full width */
+}
+
 
 a {
   font-weight: 500;
@@ -44,7 +52,7 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.55s;
 }
 button:hover {
   border-color: #646cff;
