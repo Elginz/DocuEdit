@@ -6,12 +6,23 @@ import { zoomPlugin } from '@react-pdf-viewer/zoom';
 // Import ReactPDFViewer to view pdf and to drag and drop
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
+
+// Import react Quill and Quill styles
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
 import './App.css';
 
 function App() {
   //states for storing pdf files that utilise drag and drop 
   const [pdfFile, setPdfFile] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+
+  //state for storing text editor
+  const [value, setValue] = useState('');
+  //state for text position on mouse cursor
+  const [textPosition, setTextPosition] = useState(null);
+  // return <ReactQuill theme="snow" value={value} onChange={setValue} />;
 
   //Drag function
   const DragFile = (event) => {
@@ -58,6 +69,31 @@ function App() {
   const zoomPluginInstance = zoomPlugin();
   const { ZoomInButton, ZoomOutButton } = zoomPluginInstance
 
+  //Determine mouse position and clicks
+  const mousePositionClick = (event) =>{
+    if(!pdfFile){
+      return;
+    }
+
+    //PDF viewer element
+    const pdfViewer = document.querySelector('.pdfViewer');
+
+    //Get the position of the rectangle of the PDF viewer
+    const {top, left, width, height} = pdfViewer.getBoundingClientRect();
+    if(event.clientX > left && event.clientX < left + width && 
+      event.clientY > top && event.clientY < top + height)
+      {
+        setTextPosition({x: event.clientX, y: event.clientY});
+        console.log( setTextPosition({x: event.clientX, y: event.clientY}))
+      }
+  };
+
+
+  // Add text to pdf based on the clicked position
+  const addText = (event) => {
+
+  };
+
 
   return (
     <>
@@ -67,9 +103,12 @@ function App() {
         <button onClick={() => setPdfFile(null)}>Save</button>
         <button onClick={() => setPdfUrl(null)}>Add Text</button>
         <button onClick={() => setPdfFile(null)}>Remove Text</button>
-        <button onClick={() => setPdfFile(null)}>TEXT STYLES</button>
+        {/* <button onClick={() => setPdfFile(null)}>TEXT STYLES</button> */}
         <ZoomInButton />
         <ZoomOutButton />
+
+        {/* <ReactQuill theme="snow" value={value} onChange={setValue} />; */}
+
         </div>
       }
 
@@ -77,7 +116,8 @@ function App() {
       {/* PDF Preview */}
       {pdfUrl && (
         <div className = "PDFViewer"
-        style={{ marginBottom: '20px', border: '10px solid #ccc', width: '100%', height: '90vh',overflow: 'auto'}}>
+        style={{ marginBottom: '20px', border: '10px solid #ccc', width: '100%', height: '90vh',overflow: 'auto'}}
+        onClick = {mousePositionClick}>
         {/* Worker URL to be compatible to the npm version  */} 
       <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
         <Viewer fileUrl={pdfUrl} plugins = {[zoomPluginInstance]}/>
