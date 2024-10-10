@@ -14,3 +14,5 @@ Currently, two official plugins are available:
 
 
 [Distributing mac apps outside apple store](https://www.rambo.codes/posts/2021-01-08-distributing-mac-apps-outside-the-app-store)
+
+[How to install and use React Native](https://www.youtube.com/watch?v=YysKbNk1tj0)
